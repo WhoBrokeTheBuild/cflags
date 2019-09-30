@@ -259,6 +259,7 @@ static void _cflags_process_flag(cflags_flag_t * flag, const char * value)
             }
         }
         break;
+    default: ;
     }
 }
 

@@ -1,0 +1,9 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+includedir=include
+
+Name: cFlags
+Description: Command Line Argument Parser in C
+Version: @VERSION@
+
+Requires:
+Cflags: -I${includedir}

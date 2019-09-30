@@ -5,6 +5,15 @@
 
 cFlags is a header only library. To use it, simply copy `cflags.h` to your project, or add it to your include path.
 
+You may also install it using cmake, like so:
+
+```
+cmake path/to/source
+sudo make install
+```
+
+This will install both CMake and pkg-config configuration files.
+
 ## Usage
 
 ```c
