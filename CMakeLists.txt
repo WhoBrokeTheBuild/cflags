@@ -27,20 +27,20 @@ WRITE_BASIC_PACKAGE_VERSION_FILE(
 INSTALL(
     EXPORT cflagsTargets
     NAMESPACE cflags::
-    DESTINATION cmake/cflags
+    DESTINATION lib/cmake/cflags
 )
 
 CONFIGURE_PACKAGE_CONFIG_FILE(
     ${CMAKE_SOURCE_DIR}/cmake/cflagsConfig.cmake.in
     ${CMAKE_BINARY_DIR}/cflagsConfig.cmake
-    INSTALL_DESTINATION cmake/cflags
+    INSTALL_DESTINATION lib/cmake/cflags
 )
 
 INSTALL(
     FILES 
         ${CMAKE_BINARY_DIR}/cflagsConfigVersion.cmake
         ${CMAKE_BINARY_DIR}/cflagsConfig.cmake
-    DESTINATION cmake/cflags
+    DESTINATION lib/cmake/cflags
 )
 
 INCLUDE(FindPkgConfig)
