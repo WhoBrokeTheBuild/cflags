@@ -4,12 +4,14 @@ PROJECT(cflags LANGUAGES C VERSION 1.0.0)
 
 ADD_LIBRARY(cflags INTERFACE)
 
-TARGET_INCLUDE_DIRECTORIES(cflags INTERFACE
+TARGET_INCLUDE_DIRECTORIES(
+    cflags INTERFACE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>
     $<INSTALL_INTERFACE:include>
 )
 
-INSTALL(TARGETS cflags
+INSTALL(
+    TARGETS cflags
     EXPORT cflagsTargets
     INCLUDES DESTINATION include
 )
@@ -22,26 +24,23 @@ WRITE_BASIC_PACKAGE_VERSION_FILE(
     COMPATIBILITY AnyNewerVersion
 )
 
-INSTALL(EXPORT cflagsTargets
-    FILE cflagsTargets.cmake
+INSTALL(
+    EXPORT cflagsTargets
     NAMESPACE cflags::
-    DESTINATION lib/cmake/cflags
+    DESTINATION cmake/cflags
 )
 
 CONFIGURE_PACKAGE_CONFIG_FILE(
     ${CMAKE_SOURCE_DIR}/cmake/cflagsConfig.cmake.in
     ${CMAKE_BINARY_DIR}/cflagsConfig.cmake
-    INSTALL_DESTINATION lib/cmake/cflags
+    INSTALL_DESTINATION cmake/cflags
 )
 
-INSTALL(EXPORT cflagsTargets 
-    DESTINATION lib/cmake/cflags
-)
-
-INSTALL(FILES 
-    ${CMAKE_BINARY_DIR}/cflagsConfigVersion.cmake
-    ${CMAKE_BINARY_DIR}/cflagsConfig.cmake
-    DESTINATION lib/cmake/cflags
+INSTALL(
+    FILES 
+        ${CMAKE_BINARY_DIR}/cflagsConfigVersion.cmake
+        ${CMAKE_BINARY_DIR}/cflagsConfig.cmake
+    DESTINATION cmake/cflags
 )
 
 INCLUDE(FindPkgConfig)
@@ -53,14 +52,14 @@ IF(PKG_CONFIG_FOUND)
         @ONLY
     )
 
-    INSTALL(FILES
-        ${CMAKE_BINARY_DIR}/cflags.pc
+    INSTALL(
+        FILES ${CMAKE_BINARY_DIR}/cflags.pc
         DESTINATION share/pkgconfig
     )
 ENDIF()
 
-INSTALL(DIRECTORY
-    ${CMAKE_SOURCE_DIR}/include/
+INSTALL(
+    DIRECTORY ${CMAKE_SOURCE_DIR}/include/
     DESTINATION include
 )
 
