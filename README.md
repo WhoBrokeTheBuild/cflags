@@ -1,9 +1,9 @@
 
-# cFlags
+# cflags
 
 ## Building
 
-cFlags is a header only library. To use it, simply copy `cflags.h` to your project, or add it to your include path.
+cflags is a header only library. To use it, simply copy `cflags.h` to your project, or add it to your include path.
 
 You may also install it using cmake, like so:
 
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
             "[OPTION]... [ARG]...", 
             "Tests the cflags library.", 
             "Additional information about this library can be found by at:\n"
-            "  https://github.com/WhoBrokeTheBuild/cFlags");
+            "  https://github.com/WhoBrokeTheBuild/cflags");
     }
 
     // Cleanup
