@@ -84,7 +84,11 @@ typedef struct cflags cflags_t;
 
 static cflags_t * cflags_init()
 {
-    cflags_t * flags = malloc(sizeof(cflags_t));
+    cflags_t * flags = (cflags_t *)malloc(sizeof(cflags_t));
+    if (!flags) {
+        fprintf(stderr, "cflags: out of memory");
+        return NULL;
+    }
     flags->program = NULL;
     flags->argc = 0;
     flags->argv = NULL;
@@ -101,11 +105,19 @@ cflags_flag_t * _cflags_add_flag(cflags_t * flags)
         while (flag->next) {
             flag = flag->next;
         }
-        flag->next = malloc(sizeof(cflags_flag_t));
+        flag->next = (cflags_flag_t *)malloc(sizeof(cflags_flag_t));
+        if (!flag->next) {
+            fprintf(stderr, "cflags: out of memory");
+            return NULL;
+        }
         new_flag = flag->next;
     }
     else {
         flags->first_flag = malloc(sizeof(cflags_flag_t));
+        if (!flags->first_flag) {
+            fprintf(stderr, "cflags: out of memory");
+            return NULL;
+        }
         new_flag = flags->first_flag;
     }
 
