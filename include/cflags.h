@@ -2,19 +2,19 @@
 // cflags version 1.1.0
 //
 // MIT License
-// 
+//
 // Copyright (c) 2020 Stephen Lane-Walsh
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -95,6 +95,7 @@ static cflags_t * cflags_init()
         fprintf(stderr, CFLAGS_ERROR_OOM);
         return NULL;
     }
+
     flags->program = NULL;
     flags->argc = 0;
     flags->argv = NULL;
@@ -237,7 +238,7 @@ static cflags_flag_t * cflags_add_float_callback(cflags_t * flags, char short_na
     if (!flag) {
         return NULL;
     }
-    
+
     flag->short_name = short_name;
     flag->long_name = long_name;
     flag->type = CFLAGS_TYPE_FLOAT_CALLBACK;
@@ -248,12 +249,12 @@ static cflags_flag_t * cflags_add_float_callback(cflags_t * flags, char short_na
 
 static bool _cflags_parse_bool(const char * str)
 {
-    return !(strcmp(str, "false") == 0 || 
+    return !(strcmp(str, "false") == 0 ||
             strcmp(str, "FALSE") == 0 ||
             strcmp(str, "0") == 0);
 }
 
-static void _cflags_process_flag(cflags_flag_t * flag, const char * value) 
+static void _cflags_process_flag(cflags_flag_t * flag, const char * value)
 {
     ++flag->count;
 
@@ -336,7 +337,7 @@ static void cflags_parse(cflags_t * flags, int argc, char ** argv)
             ++pch;
             if (*pch == '-') {
                 ++pch;
-                
+
                 // Long
                 char * key = pch;
                 char * value = NULL;
@@ -344,7 +345,7 @@ static void cflags_parse(cflags_t * flags, int argc, char ** argv)
                 char * divider = strchr(pch, '=');
                 if (divider) {
                     *divider = '\0';
-                    value = divider + 1;    
+                    value = divider + 1;
                 }
 
                 cflags_flag_t * flag = flags->first_flag;
@@ -436,7 +437,7 @@ static void cflags_print_usage(cflags_t * flags, const char * args, const char *
 {
     printf("%s %s\n", flags->program, args);
     printf("%s\n\n", above);
-    
+
     cflags_flag_t * flag = flags->first_flag;
     while (flag) {
         // print flag
