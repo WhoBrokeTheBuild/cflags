@@ -1,6 +1,11 @@
 
 # cflags
 
+Command line flag parsing library in C
+
+Heavily inspired by Go's `flag` package
+https://golang.org/pkg/flag/
+
 ## Building
 
 cflags is a header only library. To use it, simply copy `cflags.h` to your project, or add it to your include path.
