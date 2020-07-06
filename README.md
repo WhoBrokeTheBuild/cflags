@@ -86,9 +86,12 @@ int main(int argc, char** argv)
     printf("verbosity: %d\n", verbose->count);
 
     // Print any additional arguments, in the order they were parsed
-    for (int i = 0; i < flags->argc; ++i) {
+    for (int i = 1; i < flags->argc; ++i) {
         printf("positional arg %d: %s\n", i, flags->argv[i]);
     }
+
+    // However, argv[0] remains the same
+    printf("argv[0] = %s\n", flags->argv[0]);
 
     if (help || flags->argc == 0) {
         cflags_print_usage(flags,

@@ -1,5 +1,5 @@
 //
-// cflags version 1.1.0
+// cflags version 2.0.0
 //
 // MIT License
 //
@@ -329,7 +329,14 @@ static void _cflags_process_flag(cflags_flag_t * flag, const char * value)
 
 static void cflags_parse(cflags_t * flags, int argc, char ** argv)
 {
-    flags->program = argv[0];
+    flags->argc = 1;
+    flags->argv = (char **)malloc(flags->argc * sizeof(char *));
+    if (!flags->argv) {
+        fprintf(stderr, CFLAGS_ERROR_OOM);
+        return;
+    }
+    flags->argv[0] = argv[0];
+    flags->program = flags->argv[0];
 
     for (int i = 1; i < argc; ++i) {
         char * pch = argv[i];
