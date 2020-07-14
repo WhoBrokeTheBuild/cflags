@@ -1,6 +1,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.2 FATAL_ERROR)
 
-PROJECT(cflags LANGUAGES C VERSION 2.0.0)
+PROJECT(cflags
+    LANGUAGES C
+    DESCRIPTION "Command line flag parsing library in C"
+    VERSION 2.0.1)
+
+###
+### Install
+###
 
 ADD_LIBRARY(cflags INTERFACE)
 
@@ -62,9 +69,3 @@ INSTALL(
     DIRECTORY ${CMAKE_SOURCE_DIR}/include/
     DESTINATION include
 )
-
-# Test executable
-
-ADD_EXECUTABLE(test source/test.c)
-
-TARGET_LINK_LIBRARIES(test cflags)

@@ -1,5 +1,5 @@
 //
-// cflags version 2.0.0
+// cflags version 2.0.1
 //
 // MIT License
 //
@@ -26,6 +26,10 @@
 
 #ifndef CFLAGS_H
 #define CFLAGS_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -474,5 +478,9 @@ static void cflags_print_usage(cflags_t * flags, const char * args, const char *
 
     printf("\n%s\n", below);
 }
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif // CFLAGS_H

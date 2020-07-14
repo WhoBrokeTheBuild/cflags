@@ -51,4 +51,6 @@ int main(int argc, char** argv)
     }
 
     cflags_free(flags);
+
+    return 0;
 }
