@@ -27,14 +27,14 @@
 #ifndef CFLAGS_H
 #define CFLAGS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define CFLAGS_ERROR_OOM "cflags: out of memory"
 
