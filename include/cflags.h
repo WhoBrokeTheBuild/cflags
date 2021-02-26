@@ -454,15 +454,23 @@ static void cflags_print_usage(cflags_t * flags, const char * args, const char *
         // print flag
         printf("  ");
         if (flag->short_name != '\0') {
-            printf("-%c, ", flag->short_name);
+            printf("-%c", flag->short_name);
         }
         else {
-            printf("    ");
+            printf("  ");
         }
+
+        if (flag->short_name && flag->long_name) {
+            printf(", ");
+        }
+        else {
+            printf("  ");
+        }
+
         size_t long_name_len = 0;
         if (flag->long_name) {
             printf("--%s", flag->long_name);
-            long_name_len = strlen(flag->long_name);
+            long_name_len = strlen(flag->long_name) + 2; // Length including the --
         }
         if (long_name_len > 20) {
             printf("\n                            ");

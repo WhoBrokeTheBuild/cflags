@@ -3,7 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.2 FATAL_ERROR)
 PROJECT(cflags
     LANGUAGES C
     DESCRIPTION "Command line flag parsing library in C"
-    VERSION 2.0.1)
+    VERSION 2.0.2)
 
 ###
 ### Install
