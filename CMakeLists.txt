@@ -1,12 +1,14 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.2 FATAL_ERROR)
 
-PROJECT(cflags
-    LANGUAGES C
-    DESCRIPTION "Command line flag parsing library in C"
-    VERSION 2.0.1)
+PROJECT(
+    cflags
+    LANGUAGES C CXX
+    DESCRIPTION "Command line flag parsing library in C/C++"
+    VERSION 3.0.0
+)
 
 ###
-### Install
+### cflags
 ###
 
 ADD_LIBRARY(cflags INTERFACE)
@@ -17,8 +19,31 @@ TARGET_INCLUDE_DIRECTORIES(
     $<INSTALL_INTERFACE:include>
 )
 
+###
+### cppflags
+###
+
+ADD_LIBRARY(cppflags INTERFACE)
+
+TARGET_INCLUDE_DIRECTORIES(
+    cppflags INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>
+    $<INSTALL_INTERFACE:include>
+)
+
+SET_TARGET_PROPERTIES(
+    cppflags
+    PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+)
+
+###
+### Install
+###
+
 INSTALL(
-    TARGETS cflags
+    TARGETS cflags cppflags
     EXPORT cflagsTargets
     INCLUDES DESTINATION include
 )
@@ -68,4 +93,23 @@ ENDIF()
 INSTALL(
     DIRECTORY ${CMAKE_SOURCE_DIR}/include/
     DESTINATION include
+)
+
+###
+### Test executables
+###
+
+ADD_EXECUTABLE(example examples/example.c)
+
+TARGET_LINK_LIBRARIES(example cflags)
+
+ADD_EXECUTABLE(example-cpp examples/example.cpp)
+
+TARGET_LINK_LIBRARIES(example-cpp cppflags)
+
+SET_TARGET_PROPERTIES(
+    example-cpp
+    PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
 )

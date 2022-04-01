@@ -1,11 +1,4 @@
+*.vs
+*.vscode
+/[Bb]uild
 
-/build
-test
-cflags.pc
-cflagsConfig.cmake
-cflagsConfigVersion.cmake
-cmake_install.cmake
-CMakeCache.txt
-CMakeFiles/
-install_manifest.txt
-Makefile

@@ -28,7 +28,14 @@ int main(int argc, char** argv)
 
     cflags_flag_t * verbose = cflags_add_bool(flags, 'v', "verbose", NULL, "enables verbose output, repeat up to 4 times for more verbosity");
 
-    cflags_parse(flags, argc, argv);
+    // Parse the command arguments
+    if (!cflags_parse(flags, argc, argv) || help || argc == 1) {
+        cflags_print_usage(flags,
+            "[OPTION]... [ARG]...", 
+            "Tests the cflags library.", 
+            "Additional information about this library can be found by at:\n"
+            "  https://github.com/WhoBrokeTheBuild/cflags");
+    }
 
     printf("help: %d\n", help);
     printf("debug: %d\n", debug);
@@ -38,16 +45,9 @@ int main(int argc, char** argv)
 
     printf("verbosity: %d\n", verbose->count);
 
+    printf("argc/argv:\n");
     for (int i = 0; i < flags->argc; ++i) {
-        printf("positional arg %d: %s\n", i, flags->argv[i]);
-    }
-
-    if (help || flags->argc == 0) {
-        cflags_print_usage(flags,
-            "[OPTION]... [ARG]...", 
-            "Tests the cflags library.", 
-            "Additional information about this library can be found by contacting:\n"
-            "  sdl.slane@gmail.com");
+        printf("positional %d: %s\n", i, flags->argv[i]);
     }
 
     cflags_free(flags);

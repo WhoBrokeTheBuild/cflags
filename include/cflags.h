@@ -1,10 +1,10 @@
 //
-// cflags version 2.0.1
+// cflags version 3.0.0
 //
 // MIT License
-//
-// Copyright (c) 2020 Stephen Lane-Walsh
-//
+// 
+// Copyright (c) 2022 Stephen Lane-Walsh
+// 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -34,7 +34,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif __cplusplus
 
 #define CFLAGS_ERROR_OOM "cflags: out of memory"
 
@@ -64,18 +64,17 @@ struct cflags_flag
 
     struct cflags_flag * next;
 
-    union
-    {
-        const char ** string_value;
-        bool *        bool_value;
-        int *         int_value;
-        float *       float_value;
-
-        void (*string_callback)(const char *);
-        void (*bool_callback)(bool);
-        void (*int_callback)(int);
-        void (*float_callback)(float);
+    union {
+        const char **   string_ptr;
+        bool *          bool_ptr;
+        int *           int_ptr;
+        float *         float_ptr;
     };
+    
+    void (*string_callback)(const char *);
+    void (*bool_callback)(bool);
+    void (*int_callback)(int);
+    void (*float_callback)(float);
 };
 
 typedef struct cflags_flag cflags_flag_t;
@@ -141,7 +140,7 @@ static cflags_flag_t * cflags_add_string(cflags_t * flags, char short_name, cons
     flag->short_name = short_name;
     flag->long_name = long_name;
     flag->type = CFLAGS_TYPE_STRING;
-    flag->string_value = value;
+    flag->string_ptr = value;
     flag->description = description;
     return flag;
 }
@@ -156,7 +155,7 @@ static cflags_flag_t * cflags_add_bool(cflags_t * flags, char short_name, const 
     flag->short_name = short_name;
     flag->long_name = long_name;
     flag->type = CFLAGS_TYPE_BOOL;
-    flag->bool_value = value;
+    flag->bool_ptr = value;
     flag->description = description;
     return flag;
 }
@@ -171,7 +170,7 @@ static cflags_flag_t * cflags_add_int(cflags_t * flags, char short_name, const c
     flag->short_name = short_name;
     flag->long_name = long_name;
     flag->type = CFLAGS_TYPE_INT;
-    flag->int_value = value;
+    flag->int_ptr = value;
     flag->description = description;
     return flag;
 }
@@ -186,7 +185,7 @@ static cflags_flag_t * cflags_add_float(cflags_t * flags, char short_name, const
     flag->short_name = short_name;
     flag->long_name = long_name;
     flag->type = CFLAGS_TYPE_FLOAT;
-    flag->float_value = value;
+    flag->float_ptr = value;
     flag->description = description;
     return flag;
 }
@@ -264,10 +263,8 @@ static void _cflags_process_flag(cflags_flag_t * flag, const char * value)
 
     switch (flag->type) {
     case CFLAGS_TYPE_STRING:
-        if (flag->string_value) {
-            if (value) {
-                *flag->string_value = value;
-            }
+        if (flag->string_ptr) {
+            *flag->string_ptr = value;
         }
         break;
     case CFLAGS_TYPE_STRING_CALLBACK:
@@ -276,12 +273,12 @@ static void _cflags_process_flag(cflags_flag_t * flag, const char * value)
         }
         break;
     case CFLAGS_TYPE_BOOL:
-        if (flag->bool_value) {
+        if (flag->bool_ptr) {
             if (value) {
-                *flag->bool_value = _cflags_parse_bool(value);
+                *flag->bool_ptr = _cflags_parse_bool(value);
             }
             else {
-                *flag->bool_value = true;
+                *flag->bool_ptr = true;
             }
         }
         break;
@@ -296,34 +293,30 @@ static void _cflags_process_flag(cflags_flag_t * flag, const char * value)
         }
         break;
     case CFLAGS_TYPE_INT:
-        if (flag->int_value) {
+        if (flag->int_ptr) {
             if (value) {
-                sscanf(value, "%d", flag->int_value);
+                *flag->int_ptr = strtol(value, NULL, 10);
             }
         }
         break;
     case CFLAGS_TYPE_INT_CALLBACK:
         if (flag->int_callback) {
             if (value) {
-                int tmp = 0;
-                sscanf(value, "%d", &tmp);
-                flag->int_callback(tmp);
+                flag->int_callback(strtol(value, NULL, 10));
             }
         }
         break;
     case CFLAGS_TYPE_FLOAT:
-        if (flag->float_value) {
+        if (flag->float_ptr) {
             if (value) {
-                sscanf(value, "%f", flag->float_value);
+                *flag->float_ptr = strtof(value, NULL);
             }
         }
         break;
     case CFLAGS_TYPE_FLOAT_CALLBACK:
         if (flag->float_callback) {
             if (value) {
-                float tmp = 0.f;
-                sscanf(value, "%f", &tmp);
-                flag->float_callback(tmp);
+                flag->float_callback(strtof(value, NULL));
             }
         }
         break;
@@ -331,24 +324,31 @@ static void _cflags_process_flag(cflags_flag_t * flag, const char * value)
     }
 }
 
-static void cflags_parse(cflags_t * flags, int argc, char ** argv)
+static bool cflags_parse(cflags_t * flags, int argc, char ** argv)
 {
     flags->argc = 1;
     flags->argv = (char **)malloc(flags->argc * sizeof(char *));
     if (!flags->argv) {
         fprintf(stderr, CFLAGS_ERROR_OOM);
-        return;
+        return false;
     }
     flags->argv[0] = argv[0];
     flags->program = flags->argv[0];
 
+    bool passthrough = false;
     for (int i = 1; i < argc; ++i) {
         char * pch = argv[i];
-        if (*pch == '-') {
+        if (!passthrough && *pch == '-') {
             ++pch;
             if (*pch == '-') {
                 ++pch;
 
+                if (*pch == '\0') {
+                    // All following flags are not to be processed
+                    passthrough = true;
+                    continue;
+                }
+                
                 // Long
                 char * key = pch;
                 char * value = NULL;
@@ -359,57 +359,75 @@ static void cflags_parse(cflags_t * flags, int argc, char ** argv)
                     value = divider + 1;
                 }
 
+                bool next_arg_is_value = (i + 1 < argc && argv[i + 1][0] != '-');
+
+                bool found = false;
                 cflags_flag_t * flag = flags->first_flag;
                 while (flag) {
                     if (strcmp(flag->long_name, key) == 0) {
+                        found = true;
+
                         if (value) {
                             _cflags_process_flag(flag, value);
                         }
-                        else {
-                            if (i + 1 >= argc) {
-                                _cflags_process_flag(flag, NULL);
-                            }
-                            else {
-                                if (flag->type == CFLAGS_TYPE_BOOL ||
-                                    flag->type == CFLAGS_TYPE_BOOL_CALLBACK ||
-                                    argv[i + 1][0] == '-') {
-                                    _cflags_process_flag(flag, NULL);
-                                }
-                                else {
-                                    _cflags_process_flag(flag, argv[i + 1]);
-                                    ++i;
-                                }
-                            }
+                        else if (next_arg_is_value) {
+                            _cflags_process_flag(flag, argv[i + 1]);
+                            ++i;
                         }
+                        else if (flag->type == CFLAGS_TYPE_BOOL || flag->type == CFLAGS_TYPE_BOOL_CALLBACK) {
+                            _cflags_process_flag(flag, NULL);
+                        }
+                        else {
+                            fprintf(stderr, "%s: option '--%s' requires an value\n", flags->program, key);
+                            return false;
+                        }
+
                         break;
                     }
+
                     flag = flag->next;
+                }
+
+                if (!found) {
+                    fprintf(stderr, "%s: unrecognized option '--%s'\n", flags->program, key);
+                    return false;
                 }
             }
             else {
+                // Short
                 while (*pch) {
-                    // Short
+                    bool is_last_short_flag = (*(pch + 1) == '\0');
+                    bool next_arg_is_value = (i + 1 < argc && argv[i + 1][0] != '-');
+                    
+                    bool found = false;
                     cflags_flag_t * flag = flags->first_flag;
                     while (flag) {
                         if (flag->short_name == *pch) {
-                            if (i + 1 >= argc) {
+                            found = true;
+
+                            if (is_last_short_flag && next_arg_is_value) {
+                                _cflags_process_flag(flag, argv[i + 1]);
+                                ++i;
+                            }
+                            else if (flag->type == CFLAGS_TYPE_BOOL || flag->type == CFLAGS_TYPE_BOOL_CALLBACK) {
                                 _cflags_process_flag(flag, NULL);
                             }
                             else {
-                                if (flag->type == CFLAGS_TYPE_BOOL ||
-                                    flag->type == CFLAGS_TYPE_BOOL_CALLBACK ||
-                                    argv[i + 1][0] == '-') {
-                                    _cflags_process_flag(flag, NULL);
-                                }
-                                else {
-                                    _cflags_process_flag(flag, argv[i + 1]);
-                                    ++i;
-                                }
+                                fprintf(stderr, "%s: option '-%c' requires an value\n", flags->program, *pch);
+                                return false;
                             }
+
                             break;
                         }
+
                         flag = flag->next;
                     }
+
+                    if (!found) {
+                        fprintf(stderr, "%s: unrecognized option '-%c'\n", flags->program, *pch);
+                        return false;
+                    }
+                    
                     ++pch;
                 }
             }
@@ -419,12 +437,14 @@ static void cflags_parse(cflags_t * flags, int argc, char ** argv)
             char ** tmp = (char **)realloc(flags->argv, flags->argc * sizeof(char *));
             if (!tmp) {
                 fprintf(stderr, CFLAGS_ERROR_OOM);
-                return;
+                return false;
             }
             flags->argv = tmp;
             flags->argv[flags->argc - 1] = pch;
         }
     }
+
+    return true;
 }
 
 static void cflags_free(cflags_t * flags)
@@ -444,14 +464,13 @@ static void cflags_free(cflags_t * flags)
     flags = NULL;
 }
 
-static void cflags_print_usage(cflags_t * flags, const char * args, const char * above, const char * below)
+static void cflags_print_usage(cflags_t * flags, const char * usage, const char * above, const char * below)
 {
-    printf("%s %s\n", flags->program, args);
+    printf("%s %s\n", flags->program, usage);
     printf("%s\n\n", above);
 
     cflags_flag_t * flag = flags->first_flag;
     while (flag) {
-        // print flag
         printf("  ");
         if (flag->short_name != '\0') {
             printf("-%c, ", flag->short_name);
@@ -481,6 +500,6 @@ static void cflags_print_usage(cflags_t * flags, const char * args, const char *
 
 #ifdef __cplusplus
 } // extern "C"
-#endif
+#endif __cplusplus
 
 #endif // CFLAGS_H
