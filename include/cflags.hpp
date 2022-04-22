@@ -1,5 +1,5 @@
 //
-// cflags version 3.0.0
+// cflags version 3.0.1
 //
 // MIT License
 // 
@@ -27,6 +27,7 @@
 #ifndef CFLAGS_HPP
 #define CFLAGS_HPP
 
+#include <cstring>
 #include <string>
 #include <string_view>
 #include <vector>
