@@ -1,5 +1,5 @@
 //
-// cflags version 3.0.1
+// cflags version 3.0.2
 //
 // MIT License
 // 
@@ -34,7 +34,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif __cplusplus
+#endif // __cplusplus
 
 #define CFLAGS_ERROR_OOM "cflags: out of memory"
 
@@ -500,6 +500,6 @@ static void cflags_print_usage(cflags_t * flags, const char * usage, const char 
 
 #ifdef __cplusplus
 } // extern "C"
-#endif __cplusplus
+#endif // __cplusplus
 
 #endif // CFLAGS_H
