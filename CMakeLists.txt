@@ -4,7 +4,7 @@ PROJECT(
     cflags
     LANGUAGES C CXX
     DESCRIPTION "Command line flag parsing library in C/C++"
-    VERSION 3.0.1
+    VERSION 3.0.2
 )
 
 ###
