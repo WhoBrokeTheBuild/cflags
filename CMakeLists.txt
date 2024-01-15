@@ -1,21 +1,22 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
-PROJECT(
+project(
     cflags
     LANGUAGES C CXX
     DESCRIPTION "Command line flag parsing library in C/C++"
-    VERSION 3.0.2
+    VERSION 3.0.3
 )
 
 ###
 ### cflags
 ###
 
-ADD_LIBRARY(cflags INTERFACE)
+add_library(cflags INTERFACE)
+add_library(cflags::cflags ALIAS cflags)
 
-TARGET_INCLUDE_DIRECTORIES(
+target_include_directories(
     cflags INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
     $<INSTALL_INTERFACE:include>
 )
 
@@ -23,15 +24,16 @@ TARGET_INCLUDE_DIRECTORIES(
 ### cppflags
 ###
 
-ADD_LIBRARY(cppflags INTERFACE)
+add_library(cppflags INTERFACE)
+add_library(cflags::cppflags ALIAS cppflags)
 
-TARGET_INCLUDE_DIRECTORIES(
+target_include_directories(
     cppflags INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
     $<INSTALL_INTERFACE:include>
 )
 
-SET_TARGET_PROPERTIES(
+set_target_properties(
     cppflags
     PROPERTIES
         CXX_STANDARD 17
@@ -42,56 +44,56 @@ SET_TARGET_PROPERTIES(
 ### Install
 ###
 
-INSTALL(
+install(
     TARGETS cflags cppflags
     EXPORT cflagsTargets
     INCLUDES DESTINATION include
 )
 
-INCLUDE(CMakePackageConfigHelpers)
+include(CMakePackageConfigHelpers)
 
-WRITE_BASIC_PACKAGE_VERSION_FILE(
-    ${CMAKE_BINARY_DIR}/cflagsConfigVersion.cmake
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/cflagsConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
-INSTALL(
+install(
     EXPORT cflagsTargets
     NAMESPACE cflags::
     DESTINATION lib/cmake/cflags
 )
 
-CONFIGURE_PACKAGE_CONFIG_FILE(
-    ${CMAKE_SOURCE_DIR}/cmake/cflagsConfig.cmake.in
-    ${CMAKE_BINARY_DIR}/cflagsConfig.cmake
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cflagsConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/cflagsConfig.cmake
     INSTALL_DESTINATION lib/cmake/cflags
 )
 
-INSTALL(
+install(
     FILES 
-        ${CMAKE_BINARY_DIR}/cflagsConfigVersion.cmake
-        ${CMAKE_BINARY_DIR}/cflagsConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/cflagsConfigVersion.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/cflagsConfig.cmake
     DESTINATION lib/cmake/cflags
 )
 
-INCLUDE(FindPkgConfig)
+include(FindPkgConfig)
 
-IF(PKG_CONFIG_FOUND)
-    CONFIGURE_FILE(
-        ${CMAKE_SOURCE_DIR}/cmake/cflags.pc.in
-        ${CMAKE_BINARY_DIR}/cflags.pc
+if(PKG_CONFIG_FOUND)
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cflags.pc.in
+        ${CMAKE_CURRENT_BINARY_DIR}/cflags.pc
         @ONLY
     )
 
-    INSTALL(
-        FILES ${CMAKE_BINARY_DIR}/cflags.pc
+    install(
+        FILES ${CMAKE_CURRENT_BINARY_DIR}/cflags.pc
         DESTINATION share/pkgconfig
     )
-ENDIF()
+endif()
 
-INSTALL(
-    DIRECTORY ${CMAKE_SOURCE_DIR}/include/
+install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
     DESTINATION include
 )
 
@@ -99,17 +101,21 @@ INSTALL(
 ### Test executables
 ###
 
-ADD_EXECUTABLE(example examples/example.c)
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
 
-TARGET_LINK_LIBRARIES(example cflags)
+    add_executable(example examples/example.c)
 
-ADD_EXECUTABLE(example-cpp examples/example.cpp)
+    target_link_libraries(example cflags)
 
-TARGET_LINK_LIBRARIES(example-cpp cppflags)
+    add_executable(example-cpp examples/example.cpp)
 
-SET_TARGET_PROPERTIES(
-    example-cpp
-    PROPERTIES
-        CXX_STANDARD 17
-        CXX_STANDARD_REQUIRED ON
-)
+    target_link_libraries(example-cpp cppflags)
+
+    set_target_properties(
+        example-cpp
+        PROPERTIES
+            CXX_STANDARD 17
+            CXX_STANDARD_REQUIRED ON
+    )
+
+endif()
